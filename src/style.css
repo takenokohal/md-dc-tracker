@@ -458,10 +458,6 @@ h3 {
   padding: 7px 12px;
 }
 
-.note {
-  width: 100%;
-}
-
 .record-actions {
   display: grid;
   gap: 10px;

@@ -20,7 +20,6 @@ export function RecordScreen({ data, update, onSwitch }: Props) {
   const [turn, setTurn] = useState<Turn | null>(null)
   const [result, setResult] = useState<Result | null>(null)
   const [opp, setOpp] = useState<string | null>(null)
-  const [note, setNote] = useState('')
   const [open, setOpen] = useState<'event' | 'mine' | null>(null)
   const [addingOpp, setAddingOpp] = useState(false)
   const [last, setLast] = useState<Match | null>(null)
@@ -70,12 +69,10 @@ export function RecordScreen({ data, update, onSwitch }: Props) {
   const commit = () => {
     if (!myDeck || !turn || !opp || !result) return
     const m: Match = { id: newId(), at: Date.now(), eventId: event.id, myDeckId: myDeck.id, oppDeckId: opp, turn, result }
-    if (note.trim()) m.note = note.trim()
     update(d => ({ ...d, matches: [...d.matches, m] }))
     setTurn(null)
     setResult(null)
     setOpp(null)
-    setNote('')
     setLast(m)
   }
   const undo = () => {
@@ -84,7 +81,6 @@ export function RecordScreen({ data, update, onSwitch }: Props) {
     setTurn(last.turn)
     setResult(last.result)
     setOpp(last.oppDeckId)
-    setNote(last.note ?? '')
     setLast(null)
   }
 
@@ -177,11 +173,9 @@ export function RecordScreen({ data, update, onSwitch }: Props) {
                 追加
               </button>
             </div>
-            {addingOpp && <NameForm placeholder="相手のデッキ名" button="追加" onSubmit={addOpp} />}
           </div>
+          {addingOpp && <NameForm placeholder="相手のデッキ名" button="追加" onSubmit={addOpp} />}
         </section>
-
-        <input class="note" value={note} onInput={e => setNote(e.currentTarget.value)} placeholder="メモ（任意）" />
       </div>
 
       <div class="record-actions">
