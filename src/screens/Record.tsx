@@ -1,6 +1,6 @@
 import { ChartColumn, Check, ChevronDown, Plus, Undo2 } from 'lucide-preact'
 import { useEffect, useState } from 'preact/hooks'
-import { HoldButton } from '../components/HoldButton'
+import { ModeButton } from '../components/ModeButton'
 import { NameForm } from '../components/NameForm'
 import { Segmented } from '../components/Segmented'
 import { deckName, pct, RESULT, RESULT_OPTIONS, TURN, TURN_OPTIONS, wl } from '../format'
@@ -95,7 +95,7 @@ export function RecordScreen({ data, update, onSwitch }: Props) {
             通算 {wl(total)} <b>{pct(total.rate)}</b>
           </span>
         </div>
-        <HoldButton icon={<ChartColumn size={20} />} label="統計モードへ" onHold={onSwitch} />
+        <ModeButton icon={<ChartColumn size={20} />} label="統計モードへ" onClick={onSwitch} />
       </header>
 
       <div class="record-decks">

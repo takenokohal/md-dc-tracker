@@ -1,6 +1,7 @@
 import type { Match } from './types'
 
 export const ALL = 'all'
+export const OTHERS = 'others'
 
 export interface Filter {
   eventId: string
@@ -23,6 +24,12 @@ export interface Split {
 
 export interface GroupRow extends Split {
   id: string
+  share: number
+}
+
+export interface Slice {
+  id: string
+  games: number
   share: number
 }
 
@@ -61,4 +68,19 @@ export function groupBy(ms: Match[], key: 'oppDeckId' | 'myDeckId'): GroupRow[] 
   return [...groups]
     .map(([id, g]) => ({ id, share: g.length / ms.length, ...split(g) }))
     .sort((a, b) => b.all.games - a.all.games)
+}
+
+// 円グラフは区分が多いと読めないので、max を超えたら上位 max-1 件と「その他」にまとめる
+export function distribution(rows: GroupRow[], max = 6): Slice[] {
+  const slices = rows.map(r => ({ id: r.id, games: r.all.games, share: r.share }))
+  if (slices.length <= max) return slices
+  const rest = slices.slice(max - 1)
+  return [
+    ...slices.slice(0, max - 1),
+    {
+      id: OTHERS,
+      games: rest.reduce((n, s) => n + s.games, 0),
+      share: rest.reduce((n, s) => n + s.share, 0),
+    },
+  ]
 }

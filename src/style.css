@@ -29,6 +29,14 @@
   --second-soft: #e8ecf4;
   --second-line: #56668b;
   --second-text: #3b4a6b;
+
+  /* 分布グラフの区分色。試合数の多い順に割り当てる */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-other: #c3c2b7;
 }
 
 * {
@@ -167,7 +175,7 @@ h3 {
   font-size: 14px;
 }
 
-/* モード切り替え（長押し） */
+/* モード切り替え */
 .mode-header {
   position: sticky;
   top: 0;
@@ -189,64 +197,27 @@ h3 {
   flex: 1;
 }
 
-.hold {
-  position: relative;
+.mode-btn {
   flex: none;
   display: flex;
   align-items: center;
   gap: 8px;
-  overflow: hidden;
   background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: 12px;
-  padding: 6px 12px 6px 10px;
-  line-height: 1.25;
-  text-align: left;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  touch-action: none;
-}
-
-.hold-fill {
-  position: absolute;
-  inset: 0;
-  background: var(--green-soft);
-  transform: scaleX(0);
-  transform-origin: left;
-}
-
-.hold.holding {
-  border-color: var(--green-line);
-}
-
-.hold.holding .hold-fill {
-  transform: scaleX(1);
-  transition: transform 0.7s linear;
-}
-
-.hold-icon,
-.hold-text {
-  position: relative;
-}
-
-.hold-icon {
-  display: flex;
-  color: var(--green-text);
-}
-
-.hold-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.hold-label {
+  padding: 8px 12px 8px 10px;
   font-size: 14px;
   font-weight: 700;
 }
 
-.hold-sub {
-  font-size: 11px;
-  color: var(--muted);
+.mode-btn:active {
+  background: var(--green-soft);
+  border-color: var(--green-line);
+}
+
+.mode-btn-icon {
+  display: flex;
+  color: var(--green-text);
 }
 
 /* セグメント：pill はタブや絞り込み、choice は先後・勝敗の選択 */
@@ -716,6 +687,120 @@ h3 {
   color: var(--text);
 }
 
+.donut {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.donut-figure {
+  position: relative;
+  flex: none;
+  width: 116px;
+  height: 116px;
+}
+
+.donut-figure svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.donut-figure circle {
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.donut-figure circle.dim,
+.legend-row.dim .swatch {
+  opacity: 0.25;
+}
+
+/* ドーナツの穴（半径 31/100）の内側に収める */
+.donut-center {
+  position: absolute;
+  inset: 22%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
+  text-align: center;
+  pointer-events: none;
+}
+
+.donut-center b {
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+}
+
+.donut-center span {
+  max-width: 100%;
+  font-size: 11px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legend {
+  flex: 1;
+  min-width: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.legend-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 0;
+  border-radius: 8px;
+  padding: 4px 6px;
+  font-size: 14px;
+  text-align: left;
+}
+
+.legend-row.on {
+  background: var(--surface-2);
+  font-weight: 700;
+}
+
+.legend-row.dim {
+  color: var(--muted);
+}
+
+.swatch {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.legend-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legend-value,
+.legend-games {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.legend-games {
+  min-width: 3.2em;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: right;
+}
+
 /* 履歴 */
 .history-tools {
   display: flex;
@@ -1086,16 +1171,18 @@ h3 {
     grid-column: auto;
   }
 
+  /* 左列はサマリー・分布・自分デッキ別。右列の相手デッキ別が長いぶんは最後の 1fr 行で吸収し、左列のカードを詰める */
   .stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto 1fr;
     gap: 0 12px;
     align-items: start;
   }
 
   .stats-grid > .opp {
     grid-column: 2;
-    grid-row: 1 / span 2;
+    grid-row: 1 / -1;
   }
 
   .settings {

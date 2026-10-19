@@ -1,6 +1,7 @@
+import { DonutChart } from '../components/DonutChart'
 import { FilterBar } from '../components/FilterBar'
 import { deckName, pct, wl } from '../format'
-import { filterMatches, groupBy, split, type Filter, type GroupRow, type Tally } from '../stats'
+import { distribution, filterMatches, groupBy, OTHERS, split, type Filter, type GroupRow, type Tally } from '../stats'
 import type { AppData, Deck, Turn } from '../types'
 
 interface Props {
@@ -14,6 +15,11 @@ export function StatsScreen({ data, filter, setFilter }: Props) {
   const s = split(ms)
   const opp = groupBy(ms, 'oppDeckId')
   const mine = groupBy(ms, 'myDeckId')
+  const dist = distribution(opp).map((d, i) => ({
+    ...d,
+    label: d.id === OTHERS ? 'その他' : deckName(data.decks, d.id),
+    color: d.id === OTHERS ? 'var(--series-other)' : `var(--series-${i + 1})`,
+  }))
 
   return (
     <div>
@@ -38,6 +44,10 @@ export function StatsScreen({ data, filter, setFilter }: Props) {
                 </div>
               </div>
             </div>
+          </section>
+          <section class="card">
+            <h2>相手デッキの分布</h2>
+            <DonutChart slices={dist} label="相手デッキの分布" caption={`${opp.length}デッキ`} />
           </section>
           <GroupSection title="相手デッキ別" rows={opp} decks={data.decks} shareLabel="遭遇率" class="opp" />
           {mine.length > 1 && <GroupSection title="自分デッキ別" rows={mine} decks={data.decks} shareLabel="使用率" />}

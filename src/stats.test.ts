@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ALL, filterMatches, groupBy, split, tally } from './stats'
+import { ALL, distribution, filterMatches, groupBy, OTHERS, split, tally } from './stats'
 import type { Match } from './types'
 
 const at = (d: number, h: number) => new Date(2026, 9, d, h).getTime()
@@ -70,5 +70,24 @@ describe('groupBy', () => {
     expect(rows[0].share).toBeCloseTo(2 / 3)
     expect(rows[0].first.rate).toBe(1)
     expect(rows[0].second.rate).toBe(0)
+  })
+})
+
+describe('distribution', () => {
+  // a を 7 戦、b を 6 戦 … g を 1 戦
+  const decks = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+  const ms = decks.flatMap((id, i) => Array.from({ length: decks.length - i }, () => match({ oppDeckId: id })))
+
+  it('区分が上限以下ならそのまま返す', () => {
+    const slices = distribution(groupBy(ms, 'oppDeckId'), 7)
+    expect(slices.map(s => s.id)).toEqual(decks)
+    expect(slices[0]).toEqual({ id: 'a', games: 7, share: 7 / 28 })
+  })
+
+  it('上限を超えたら上位とその他にまとめる', () => {
+    const slices = distribution(groupBy(ms, 'oppDeckId'))
+    expect(slices.map(s => s.id)).toEqual(['a', 'b', 'c', 'd', 'e', OTHERS])
+    expect(slices[5].games).toBe(3)
+    expect(slices[5].share).toBeCloseTo(3 / 28)
   })
 })

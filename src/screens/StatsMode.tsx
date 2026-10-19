@@ -2,7 +2,7 @@ import type { ComponentChildren } from 'preact'
 import { ChartColumn, History, NotebookPen, Settings } from 'lucide-preact'
 import { useEffect, useState } from 'preact/hooks'
 import type { Session } from '../backend/types'
-import { HoldButton } from '../components/HoldButton'
+import { ModeButton } from '../components/ModeButton'
 import { Segmented } from '../components/Segmented'
 import { ALL, type Filter } from '../stats'
 import type { Update } from '../store'
@@ -55,7 +55,7 @@ export function StatsMode({ data, update, session, onSwitch }: Props) {
       <header class="mode-header">
         <div class="mode-header-inner">
           <Segmented value={tab} options={TABS} onChange={setTab} />
-          <HoldButton icon={<NotebookPen size={20} />} label="起票モードへ" onHold={onSwitch} />
+          <ModeButton icon={<NotebookPen size={20} />} label="起票モードへ" onClick={onSwitch} />
         </div>
       </header>
       <main class="content">
