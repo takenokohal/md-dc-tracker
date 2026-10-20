@@ -2,6 +2,7 @@ import { useEffect, useState } from 'preact/hooks'
 import { backend } from './backend'
 import type { Session } from './backend/types'
 import { isIOS, isStandalone } from './format'
+import { slideTo } from './motion'
 import { Login } from './screens/Login'
 import { RecordScreen } from './screens/Record'
 import { StatsMode } from './screens/StatsMode'
@@ -37,7 +38,7 @@ function Main({ session }: { session: Session }) {
 
   const switchTo = (m: Mode) => {
     localStorage.setItem(MODE_KEY, m)
-    setMode(m)
+    slideTo(m === 'stats' ? 'forward' : 'back', () => setMode(m))
   }
 
   if (!data) return <p class="loading">読み込み中…</p>

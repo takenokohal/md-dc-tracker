@@ -1,4 +1,4 @@
-import { useState } from 'preact/hooks'
+import { useId, useState } from 'preact/hooks'
 import { pct } from '../format'
 
 export interface DonutSlice {
@@ -22,6 +22,7 @@ const C = 2 * Math.PI * R
 const GAP = 1.8
 
 export function DonutChart({ slices, label, caption }: Props) {
+  const maskId = useId()
   const [selected, setSelected] = useState<string | null>(null)
   const sel = slices.find(s => s.id === selected)
   const total = slices.reduce((n, s) => n + s.games, 0)
@@ -36,15 +37,13 @@ export function DonutChart({ slices, label, caption }: Props) {
     const arc = (
       <circle
         key={s.id}
-        class={dim(s.id)}
+        class={sel?.id === s.id ? 'on' : dim(s.id)}
         cx={50}
         cy={50}
         r={R}
         fill="none"
         stroke-width={WIDTH}
-        stroke-dasharray={`${dash} ${C - dash}`}
-        stroke-dashoffset={-offset}
-        style={{ stroke: s.color }}
+        style={{ stroke: s.color, strokeDasharray: `${dash} ${C - dash}`, strokeDashoffset: -offset }}
         onClick={() => toggle(s.id)}
       />
     )
@@ -56,9 +55,23 @@ export function DonutChart({ slices, label, caption }: Props) {
     <div class="donut">
       <div class="donut-figure">
         <svg viewBox="0 0 100 100" role="img" aria-label={label}>
-          <g transform="rotate(-90 50 50)">{arcs}</g>
+          {/* 表示したときに 12 時から時計回りに描く。選んだ区分が外に膨らんでも切れないよう幅に余裕を持たせる */}
+          <mask id={maskId} maskUnits="userSpaceOnUse" x={0} y={0} width={100} height={100}>
+            <circle
+              class="donut-sweep"
+              cx={50}
+              cy={50}
+              r={R}
+              fill="none"
+              stroke="#fff"
+              stroke-width={WIDTH + 10}
+            />
+          </mask>
+          <g transform="rotate(-90 50 50)" mask={`url(#${maskId})`}>
+            {arcs}
+          </g>
         </svg>
-        <div class="donut-center">
+        <div class="donut-center" key={sel?.id}>
           <b>{sel ? pct(sel.share) : `${total}戦`}</b>
           <span>{sel ? sel.label : caption}</span>
         </div>

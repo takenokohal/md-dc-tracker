@@ -3,6 +3,7 @@ import { useEffect, useState } from 'preact/hooks'
 import { ModeButton } from '../components/ModeButton'
 import { NameForm } from '../components/NameForm'
 import { Segmented } from '../components/Segmented'
+import { Toast } from '../components/Toast'
 import { deckName, pct, RESULT, RESULT_OPTIONS, TURN, TURN_OPTIONS, wl } from '../format'
 import { startOfDay, tally } from '../stats'
 import { newDeck, newId, sortDecks, type Update } from '../store'
@@ -191,7 +192,7 @@ export function RecordScreen({ data, update, onSwitch }: Props) {
       </div>
 
       {last && (
-        <div class="toast" key={last.id}>
+        <Toast key={last.id} ms={TOAST_MS} onClose={() => setLast(null)}>
           <div class="toast-body">
             <b>起票しました</b>
             <span>
@@ -202,8 +203,7 @@ export function RecordScreen({ data, update, onSwitch }: Props) {
             <Undo2 size={16} />
             取り消す
           </button>
-          <div class="toast-timer" style={{ animationDuration: `${TOAST_MS}ms` }} />
-        </div>
+        </Toast>
       )}
     </div>
   )

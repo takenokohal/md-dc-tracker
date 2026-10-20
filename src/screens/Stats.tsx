@@ -1,6 +1,8 @@
+import { Sprout } from 'lucide-preact'
 import { DonutChart } from '../components/DonutChart'
 import { FilterBar } from '../components/FilterBar'
 import { deckName, pct, wl } from '../format'
+import { useTween } from '../motion'
 import { distribution, filterMatches, groupBy, OTHERS, split, type Filter, type GroupRow, type Tally } from '../stats'
 import type { AppData, Deck, Turn } from '../types'
 
@@ -25,11 +27,14 @@ export function StatsScreen({ data, filter, setFilter }: Props) {
     <div>
       <FilterBar data={data} filter={filter} setFilter={setFilter} />
       {ms.length === 0 ? (
-        <p class="empty">この条件の記録はまだないよ</p>
+        <p class="empty">
+          <Sprout size={28} />
+          この条件の記録はまだないよ
+        </p>
       ) : (
         <div class="stats-grid">
           <section class="card summary">
-            <div class="big-rate">{pct(s.all.rate)}</div>
+            <BigRate rate={s.all.rate ?? 0} />
             <div class="sub">
               {s.all.games}戦 {wl(s.all)}
             </div>
@@ -55,6 +60,10 @@ export function StatsScreen({ data, filter, setFilter }: Props) {
       )}
     </div>
   )
+}
+
+function BigRate({ rate }: { rate: number }) {
+  return <div class="big-rate">{pct(useTween(rate))}</div>
 }
 
 function Cell({ label, t, kind }: { label: string; t: Tally; kind: Turn }) {
