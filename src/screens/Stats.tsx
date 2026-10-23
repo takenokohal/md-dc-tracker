@@ -4,6 +4,7 @@ import { FilterBar } from '../components/FilterBar'
 import { deckName, pct, wl } from '../format'
 import { useTween } from '../motion'
 import { distribution, filterMatches, groupBy, OTHERS, split, type Filter, type GroupRow, type Tally } from '../stats'
+import { UNKNOWN_OPP } from '../store'
 import type { AppData, Deck, Turn } from '../types'
 
 interface Props {
@@ -17,10 +18,12 @@ export function StatsScreen({ data, filter, setFilter }: Props) {
   const s = split(ms)
   const opp = groupBy(ms, 'oppDeckId')
   const mine = groupBy(ms, 'myDeckId')
-  const dist = distribution(opp).map((d, i) => ({
+  const unknown = data.decks.find(d => d.pinned && d.name === UNKNOWN_OPP)?.id
+  const dist = distribution(opp, { last: unknown }).map((d, i) => ({
     ...d,
     label: d.id === OTHERS ? 'その他' : deckName(data.decks, d.id),
-    color: d.id === OTHERS ? 'var(--series-other)' : `var(--series-${i + 1})`,
+    color:
+      d.id === OTHERS ? 'var(--series-other)' : d.id === unknown ? 'var(--series-unknown)' : `var(--series-${i + 1})`,
   }))
 
   return (

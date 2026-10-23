@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { ALL, distribution, filterMatches, groupBy, OTHERS, split, tally } from './stats'
-import type { Match } from './types'
+import { ALL, byEncounter, distribution, filterMatches, groupBy, OTHERS, split, tally } from './stats'
+import type { Deck, Match } from './types'
 
 const at = (d: number, h: number) => new Date(2026, 9, d, h).getTime()
 let seq = 0
@@ -73,13 +73,28 @@ describe('groupBy', () => {
   })
 })
 
+describe('byEncounter', () => {
+  const deck = (id: string): Deck => ({ id, name: id, hidden: false })
+  const decks = ['a', 'b', 'c', 'd'].map(deck)
+
+  it('相手として当たった回数の多い順に並べる', () => {
+    const ms = [match({ oppDeckId: 'c' }), match({ oppDeckId: 'b' }), match({ oppDeckId: 'c' })]
+    expect(byEncounter(decks, ms).map(d => d.id)).toEqual(['c', 'b', 'a', 'd'])
+  })
+
+  it('同じ回数なら渡した順を保つ', () => {
+    const ms = [match({ oppDeckId: 'd' }), match({ oppDeckId: 'b' })]
+    expect(byEncounter(decks, ms).map(d => d.id)).toEqual(['b', 'd', 'a', 'c'])
+  })
+})
+
 describe('distribution', () => {
   // a を 7 戦、b を 6 戦 … g を 1 戦
   const decks = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
   const ms = decks.flatMap((id, i) => Array.from({ length: decks.length - i }, () => match({ oppDeckId: id })))
 
   it('区分が上限以下ならそのまま返す', () => {
-    const slices = distribution(groupBy(ms, 'oppDeckId'), 7)
+    const slices = distribution(groupBy(ms, 'oppDeckId'), { max: 7 })
     expect(slices.map(s => s.id)).toEqual(decks)
     expect(slices[0]).toEqual({ id: 'a', games: 7, share: 7 / 28 })
   })
@@ -89,5 +104,17 @@ describe('distribution', () => {
     expect(slices.map(s => s.id)).toEqual(['a', 'b', 'c', 'd', 'e', OTHERS])
     expect(slices[5].games).toBe(3)
     expect(slices[5].share).toBeCloseTo(3 / 28)
+  })
+
+  it('last の区分は一番多くても末尾に置く', () => {
+    const slices = distribution(groupBy(ms, 'oppDeckId'), { max: 7, last: 'a' })
+    expect(slices.map(s => s.id)).toEqual(['b', 'c', 'd', 'e', 'f', 'g', 'a'])
+  })
+
+  it('上限を超えても last の区分はその他に混ぜず、その他の後ろに置く', () => {
+    const slices = distribution(groupBy(ms, 'oppDeckId'), { last: 'a' })
+    expect(slices.map(s => s.id)).toEqual(['b', 'c', 'd', 'e', OTHERS, 'a'])
+    expect(slices[4].games).toBe(3)
+    expect(slices[5]).toEqual({ id: 'a', games: 7, share: 7 / 28 })
   })
 })

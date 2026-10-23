@@ -44,6 +44,7 @@
   --series-4: #f3b986;
   --series-5: #b6a3e4;
   --series-other: #e0e5d9;
+  --series-unknown: #eadfcd;
 
   /* 欧文と数字は Nunito（丸みがあり、数字の幅揃えに対応）、日本語は Zen Maru Gothic */
   --font: 'Nunito', 'Zen Maru Gothic', -apple-system, BlinkMacSystemFont, 'Hiragino Maru Gothic ProN', 'Hiragino Sans',

@@ -5,7 +5,7 @@ import { NameForm } from '../components/NameForm'
 import { Segmented } from '../components/Segmented'
 import { Toast } from '../components/Toast'
 import { deckName, pct, RESULT, RESULT_OPTIONS, TURN, TURN_OPTIONS, wl } from '../format'
-import { startOfDay, tally } from '../stats'
+import { byEncounter, startOfDay, tally } from '../stats'
 import { newDeck, newId, sortDecks, type Update } from '../store'
 import type { AppData, DcEvent, Match, Result, Turn } from '../types'
 
@@ -36,6 +36,7 @@ export function RecordScreen({ data, update, onSwitch }: Props) {
   const myDecks = decks.filter(d => !d.pinned)
   const myDeck = data.decks.find(d => d.id === data.currentMyDeckId)
   const eventMatches = data.matches.filter(m => m.eventId === event.id)
+  const oppDecks = [...byEncounter(myDecks, eventMatches), ...decks.filter(d => d.pinned)]
   const today = tally(eventMatches.filter(m => m.at >= startOfDay(Date.now())))
   const total = tally(eventMatches)
   const missing = [!myDeck && '自分のデッキ', !opp && '相手のデッキ', !turn && '先攻/後攻', !result && '勝敗'].filter(Boolean)
@@ -159,7 +160,7 @@ export function RecordScreen({ data, update, onSwitch }: Props) {
           <div class="label">相手のデッキ</div>
           <div class="opp-scroll">
             <div class="chips">
-              {decks.map(d => (
+              {oppDecks.map(d => (
                 <button
                   key={d.id}
                   type="button"

@@ -5,7 +5,8 @@ import type { AppData, Deck, Match, Settings, StoredSettings } from './types'
 
 export type Update = (fn: (d: AppData) => AppData) => void
 
-const PINNED_OPP = ['未確定', '地雷']
+export const UNKNOWN_OPP = '未確定'
+const PINNED_OPP = [UNKNOWN_OPP, '地雷']
 const SETTINGS_KEYS = ['version', 'decks', 'events', 'currentEventId', 'currentMyDeckId'] as const
 
 export const newId = () => crypto.randomUUID()
